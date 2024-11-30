@@ -37,6 +37,8 @@ class ForestLiana::Router
           end
         end
 
+        params["action"] = action
+        params["controller"] = "#{env["SCRIPT_NAME"]}/#{collection_name}".delete_prefix("/")
         controller.action(action.to_sym).call(env)
       rescue NoMethodError => exception
         FOREST_REPORTER.report exception
