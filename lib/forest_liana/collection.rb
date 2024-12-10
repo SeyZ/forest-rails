@@ -90,6 +90,7 @@ module ForestLiana::Collection
 
       if serializer_name && ForestLiana::UserSpace.const_defined?(
           serializer_name)
+        compute_value = nil
         ForestLiana::UserSpace.const_get(serializer_name).class_eval do
           if block
             # NOTICE: Smart Field case.
@@ -108,6 +109,18 @@ module ForestLiana::Collection
           else
             # NOTICE: Smart Collection field case.
             attribute(name)
+          end
+        end
+
+        # In case of smart field declare on STI class
+        # the smart field was added on these subclasses
+        unless active_record_class.subclasses.empty?
+          active_record_class.subclasses.each do |subclass|
+            if ForestLiana::UserSpace.const_defined?(serializer_name_for(subclass))
+              ForestLiana::UserSpace.const_get(serializer_name_for(subclass)).class_eval do
+                attribute(name, &compute_value)
+              end
+            end
           end
         end
       end
@@ -219,6 +232,13 @@ module ForestLiana::Collection
 
         "ForestLiana::UserSpace::#{serializer_name}"
       end
+    end
+
+    def serializer_name_for(subclass)
+      component_prefix = ForestLiana.component_prefix(subclass)
+      serializer_name = "#{component_prefix}Serializer"
+
+      "ForestLiana::UserSpace::#{serializer_name}"
     end
 
     def serializer_name_for_reference(reference)
