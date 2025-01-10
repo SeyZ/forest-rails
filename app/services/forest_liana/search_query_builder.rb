@@ -150,7 +150,7 @@ module ForestLiana
           conditions.join(' OR '),
           search_value_for_string: "%#{@search.downcase}%",
           search_value_for_uuid: @search.to_s
-        )
+        ) unless conditions.empty?
       end
 
       @records
