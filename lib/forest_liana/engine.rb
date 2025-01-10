@@ -96,8 +96,11 @@ module ForestLiana
         FOREST_LOGGER.error "Impossible to set the whitelisted Forest " \
           "domains for CORS constraint:\n#{error}"
       end
-
-      eager_load_active_record_descendants(app)
+      
+      # if there are running pending migrations thru `rails db:migrate`, don't load ALL the models
+      if database_available? && !ActiveRecord::Base.connection.migration_context.needs_migration?
+        eager_load_active_record_descendants(app)
+      end
 
       if database_available?
         # NOTICE: Do not run the code below on rails g forest_liana:install.
