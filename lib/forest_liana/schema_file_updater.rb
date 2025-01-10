@@ -121,7 +121,7 @@ module ForestLiana
 
       # NOTICE: Sort keys
       @collections = @collections.map do |collection|
-        collection['fields'].sort do |field1, field2|
+        collection['fields'].sort! do |field1, field2|
           [field1['field'], field1['type'].inspect] <=> [field2['field'], field2['type'].inspect]
         end
 
